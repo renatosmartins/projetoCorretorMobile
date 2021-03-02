@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState} from 'react';
 
 import { Dimensions, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import MapView, { Marker, Callout, PROVIDER_GOOGLE } from 'react-native-maps';
@@ -6,12 +6,32 @@ import mapMarker from '../images/map-marker.png';
 
 import { Feather } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
+import { RectButton } from 'react-native-gesture-handler';
+import api from '../services/api';
+
+interface Immobobile {
+  id: number;
+  name: string;
+  latitude: number;
+  longitude: number;
+}
 
 export default function PropertiesMap() {
+    const [properties, setProperties] = useState<Immobobile[]>([]);
     const navigation = useNavigation()
 
-    function handleNavigateToImmobileDetails() {
-        navigation.navigate('ImmobileDetails')
+    useEffect(() => {
+      api.get('/properties').then(response => {
+        setProperties(response.data);
+      })
+    }, [])
+
+    function handleNavigateToImmobileDetails(id: number) {
+        navigation.navigate('ImmobileDetails', { id })
+    }
+
+    function handleNavigateToCreateImmobile() {
+        navigation.navigate('SelectMapPosition')
     }
 
     return (<View style={styles.container}>
@@ -25,30 +45,37 @@ export default function PropertiesMap() {
             longitudeDelta: 0.010,
             }} 
         >
-          <Marker 
-            icon={mapMarker}
-            calloutAnchor={{
-              x: 2.2,
-              y: 0.7,
-            }}
-            coordinate={{
-              latitude: -16.6803002,
-              longitude: -49.2570308,
-            }}
-          > 
-            <Callout tooltip={true} onPress={handleNavigateToImmobileDetails}>
-              <View style={styles.calloutContainer}>
-                <Text style={styles.calloutText}>Lar das meninas</Text>  
-              </View>
-            </Callout>
-          </Marker>
+          {properties.map(immobile => {
+             return (
+              <Marker 
+                key={immobile.id}
+                icon={mapMarker}
+                calloutAnchor={{
+                  x: 2.2,
+                  y: 0.7,
+                }}
+                coordinate={{
+                  latitude: immobile.latitude,
+                  longitude: immobile.longitude
+                }}
+              > 
+                <Callout tooltip={true} 
+                  onPress={() => handleNavigateToImmobileDetails(immobile.id)}>
+                  <View style={styles.calloutContainer}>
+                    <Text style={styles.calloutText}>{immobile.name}</Text>  
+                  </View>
+                </Callout>
+              </Marker>
+            )
+          })}
         </MapView>
         <View style={styles.footer}>
-            <Text style={styles.footerText}>2 orfanatos encotrados</Text>
+            <Text style={styles.footerText}>{properties.length} imóveis encotrados</Text>
   
-            <TouchableOpacity style={styles.createOrphanageButton} onPress={() => {}}>
+            <RectButton style={styles.createImmobileButton} 
+              onPress={handleNavigateToCreateImmobile}>
               <Feather name="plus" size={20} color='#fff' />
-            </TouchableOpacity>
+            </RectButton>
   
         </View>
       </View>)
@@ -97,7 +124,8 @@ const styles = StyleSheet.create({
       color: '#8fa7b3',
       
     },
-    createOrphanageButton: {
+
+    createImmobileButton: {
       width: 56,
       height: 56,
       backgroundColor: '#15c3d6',
