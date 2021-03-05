@@ -21,10 +21,7 @@ export default function ImmobileData() {
 
   const route = useRoute();
   const params = route.params as OrphanageDataRouteParams;
-
   const navigation = useNavigation();
-
-  const position = params.position;
 
   async function handleCreateImmobile() {
     const { latitude, longitude } = params.position;
@@ -46,13 +43,13 @@ export default function ImmobileData() {
         uri: image,
       } as any)
     })
-
     await api.post('properties', data);
     navigation.navigate('PropertiesMap');
-
   }
 
   async function handleSelectImages() {
+    {/*const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();*/}
+
     const { status } = await ImagePicker.requestCameraRollPermissionsAsync();
 
     if (status !== 'granted') {
