@@ -42,15 +42,16 @@ export default function ImmobileData() {
         type: 'image/jpg',
         uri: image,
       } as any)
-    })
+    });
+
     await api.post('properties', data);
+
     navigation.navigate('PropertiesMap');
   }
 
-  async function handleSelectImages() {
-    {/*const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();*/}
+    async function handleSelectImages() {
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
 
-    const { status } = await ImagePicker.requestCameraRollPermissionsAsync();
 
     if (status !== 'granted') {
       alert('Eita! Precisamos de acesso às suas fotos...');

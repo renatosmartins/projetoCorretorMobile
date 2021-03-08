@@ -1,11 +1,11 @@
-import React, { useEffect, useState} from 'react';
+import React, { useState } from 'react';
 
 import { Dimensions, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import MapView, { Marker, Callout, PROVIDER_GOOGLE } from 'react-native-maps';
 import mapMarker from '../images/map-marker.png';
 
 import { Feather } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { RectButton } from 'react-native-gesture-handler';
 import api from '../services/api';
 
@@ -20,11 +20,11 @@ export default function PropertiesMap() {
     const [properties, setProperties] = useState<Immobobile[]>([]);
     const navigation = useNavigation()
 
-    useEffect(() => {
+    useFocusEffect(() => {
       api.get('/properties').then(response => {
         setProperties(response.data);
       })
-    }, [])
+    })
 
     function handleNavigateToImmobileDetails(id: number) {
         navigation.navigate('ImmobileDetails', { id })
